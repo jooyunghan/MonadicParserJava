@@ -9,16 +9,18 @@ import java.util.function.Consumer;
  * Created by jooyung.han on 12/19/14.
  */
 public abstract class List<T> {
-    private static final List<?> NIL = new Nil();
+    private static final List<Object> NIL = new Nil();
 
     public static <T> List<T> cons(T h, List<T> t) {
-        return new Cons(h, t);
+        return new Cons<T>(h, t);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> List<T> nil() {
         return (List<T>) NIL;
     }
 
+    @SafeVarargs
     public static <T> List<T> list(T... values) {
         List<T> result = nil();
         for (int i = values.length - 1; i >= 0; i--) {
