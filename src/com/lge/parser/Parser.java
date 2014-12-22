@@ -110,15 +110,11 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
 
     default <R> Parser<R> flatMap(Function<T, Parser<R>> f) {
         final Parser<T> self = this;
-        return input -> {
-            Maybe<Pair<T, String>> result = self.apply(input);
-            return result.map(p -> f.apply(p._1).apply(p._2)).getOrElse(() -> none());
-        };
+        return input -> self.apply(input).flatMap(p -> f.apply(p._1).apply(p._2));
     }
 
     default <R> Parser<R> map(Function<T, R> f) {
-        final Parser<T> self = this;
-        return input -> self.apply(input).map(p -> pair(f.apply(p._1), p._2));
+        return flatMap(t -> succeed(f.apply(t)));
     }
 
     default <R> Parser<R> as(Supplier<R> defaultValue) {
@@ -140,7 +136,7 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
     }
 
     default Parser<T> suffix(Parser<?> right) {
-        return flatMap(t -> right.flatMap(x -> succeed(t)));
+        return flatMap(t -> right.map(x -> t));
     }
 
     default Parser<List<T>> sepBy1(Parser<?> sep) {

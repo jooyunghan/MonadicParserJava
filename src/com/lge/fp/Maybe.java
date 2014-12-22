@@ -23,6 +23,11 @@ public interface Maybe<T> {
         else return some(f.apply(get()));
     }
 
+    default <R> Maybe<R> flatMap(Function<T, Maybe<R>> f) {
+        if (isEmpty()) return none();
+        else return f.apply(get());
+    }
+
     boolean isEmpty();
 
     T get();
