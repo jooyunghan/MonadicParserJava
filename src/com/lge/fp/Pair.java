@@ -19,11 +19,7 @@ public class Pair<S, T> {
         if (o == null || getClass() != o.getClass()) return false;
 
         Pair pair = (Pair) o;
-
-        if (!_1.equals(pair._1)) return false;
-        if (!_2.equals(pair._2)) return false;
-
-        return true;
+        return _1.equals(pair._1) && _2.equals(pair._2);
     }
 
     @Override
@@ -36,5 +32,13 @@ public class Pair<S, T> {
     @Override
     public String toString() {
         return "Pair{" + _1 + ", " + _2 + '}';
+    }
+
+    public S fst() {
+        return _1;
+    }
+
+    public T snd() {
+        return _2;
     }
 }

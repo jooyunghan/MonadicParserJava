@@ -55,10 +55,7 @@ public interface Maybe<T> {
             if (o == null || getClass() != o.getClass()) return false;
 
             Some some = (Some) o;
-
-            if (!value.equals(some.value)) return false;
-
-            return true;
+            return value.equals(some.value);
         }
 
         @Override

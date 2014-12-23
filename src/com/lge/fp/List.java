@@ -79,11 +79,7 @@ public abstract class List<T> {
             if (o == null || getClass() != o.getClass()) return false;
 
             Cons cons = (Cons) o;
-
-            if (!head.equals(cons.head)) return false;
-            if (!tail.equals(cons.tail)) return false;
-
-            return true;
+            return head.equals(cons.head) && tail.equals(cons.tail);
         }
 
         @Override

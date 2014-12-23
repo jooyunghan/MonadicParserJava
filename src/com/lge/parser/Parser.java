@@ -18,6 +18,8 @@ import static com.lge.fp.Maybe.some;
 import static com.lge.fp.Pair.pair;
 
 /**
+ * Monadic Parser.
+ *
  * Created by jooyung.han on 12/19/14.
  */
 
@@ -94,8 +96,8 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
         return s.flatMap(v1 -> t.get().map(v2 -> pair(v1, v2)));
     }
 
-    public static <T> Parser<T> enclosed(Parser<?> left, Parser<?> right, Supplier<Parser<? extends T>> self) {
-        return seq(left, self).suffix(right).map(p -> p._2);
+    public static <T> Parser<T> enclosed(Parser<?> left, Parser<?> right, Supplier<Parser<? extends T>> p) {
+        return seq(left, p).suffix(right).map(Pair::snd);
     }
 
     // helper
@@ -104,13 +106,11 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
     }
 
     default Parser<T> or(Parser<?> alt) {
-        final Parser<T> self = this;
-        return input -> self.apply(input).orElse(() -> alt.apply(input));
+        return input -> apply(input).orElse(() -> alt.apply(input));
     }
 
     default <R> Parser<R> flatMap(Function<T, Parser<R>> f) {
-        final Parser<T> self = this;
-        return input -> self.apply(input).flatMap(p -> f.apply(p._1).apply(p._2));
+        return input -> apply(input).flatMap(p -> f.apply(p._1).apply(p._2));
     }
 
     default <R> Parser<R> map(Function<T, R> f) {
@@ -122,8 +122,7 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
     }
 
     default Parser<List<T>> many1() {
-        final Parser<T> self = this;
-        return flatMap(t -> self.many().map(ts -> cons(t, ts)));
+        return flatMap(t -> many().map(ts -> cons(t, ts)));
     }
 
     default Parser<List<T>> many() {
@@ -131,8 +130,7 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
     }
 
     default Parser<T> prefix(Parser<?> left) {
-        final Parser<T> self = this;
-        return left.flatMap(x -> self);
+        return left.flatMap(x -> this);
     }
 
     default Parser<T> suffix(Parser<?> right) {
@@ -140,8 +138,7 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
     }
 
     default Parser<List<T>> sepBy1(Parser<?> sep) {
-        final Parser<T> self = this;
-        return self.flatMap(t -> self.prefix(sep).many().map(ts -> cons(t, ts)));
+        return flatMap(t -> prefix(sep).many().map(ts -> cons(t, ts)));
     }
 
     default Parser<List<T>> sepBy(Parser<?> sep) {
