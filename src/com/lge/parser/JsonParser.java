@@ -4,6 +4,8 @@ import com.lge.data.Json;
 import com.lge.fp.List;
 import com.lge.fp.Pair;
 
+import java.util.function.Supplier;
+
 import static com.lge.data.Json.*;
 
 /**
@@ -11,33 +13,30 @@ import static com.lge.data.Json.*;
  */
 
 public class JsonParser {
-
-    private static final Parser<?> openBrace = Parser.tok("{");
-    private static final Parser<?> closeBrace = Parser.tok("}");
-    private static final Parser<?> openBracket = Parser.tok("[");
-    private static final Parser<?> closeBracket = Parser.tok("]");
     private static final Parser<?> comma = Parser.tok(",");
     private static final Parser<?> colon = Parser.tok(":");
+    private static final Parser<String> string_ = Parser.tok(Parser.quotedString);
+    private static final Parser<Double> double_ = Parser.tok(Parser.doubleNumber);
 
     static public Parser<Json> json() {
         return Parser.or(jsonObject(), jsonArray(), jsonNumber(), jsonString(), jsonLiteral());
     }
 
     static public Parser<JsonObject> jsonObject() {
-        Parser<Pair<String, Json>> keyValue = Parser.seq(Parser.tok(Parser.quotedString).suffix(colon), () -> json());
-        return Parser.enclosed(openBrace, closeBrace, () -> keyValue.sepBy(comma)).map(List::toMap).map(JsonObject::new);
+        Parser<Pair<String, Json>> keyValue = Parser.seq(string_.suffix(colon), () -> json());
+        return brace(() -> keyValue.sepBy(comma)).map(List::toMap).map(JsonObject::new);
     }
 
     static public Parser<JsonArray> jsonArray() {
-        return Parser.enclosed(openBracket, closeBracket, () -> json().sepBy(comma)).map(JsonArray::new);
+        return bracket(() -> json().sepBy(comma)).map(JsonArray::new);
     }
 
     static public Parser<JsonNumber> jsonNumber() {
-        return Parser.tok(Parser.doubleNumber).map(JsonNumber::new);
+        return double_.map(JsonNumber::new);
     }
 
     static public Parser<JsonString> jsonString() {
-        return Parser.tok(Parser.quotedString).map(JsonString::new);
+        return string_.map(JsonString::new);
     }
 
     static public Parser<? extends Json> jsonLiteral() {
@@ -46,4 +45,11 @@ public class JsonParser {
                 Parser.tok("null").as(() -> Json.NULL));
     }
 
+    private static <T> Parser<T> brace(Supplier<Parser<T>> s) {
+        return Parser.enclosed(Parser.tok("{"), Parser.tok("}"), s);
+    }
+
+    private static <T> Parser<T> bracket(Supplier<Parser<T>> s) {
+        return Parser.enclosed(Parser.tok("["), Parser.tok("]"), s);
+    }
 }

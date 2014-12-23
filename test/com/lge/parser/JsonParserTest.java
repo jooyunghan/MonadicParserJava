@@ -35,9 +35,10 @@ public class JsonParserTest {
         Map<String, Json> props = new TreeMap<>();
         props.put("p1", new Json.JsonString("string"));
         props.put("p2", new Json.JsonArray(list(Json.TRUE, Json.FALSE, Json.NULL, new Json.JsonObject(toMap(list())))));
-        assertEquals(new Json.JsonObject(props), json().parse("{" +
-                "\"p1\" : \"string\"," +
-                "\"p2\" : [true, false, null, {}]" +
+        assertEquals(new Json.JsonObject(props), json().parse("\n" +
+                "{\n" +
+                "\t\"p1\" : \"string\",\n" +
+                "\t\"p2\" : [true, false, null, {}]\n" +
                 "}end"));
     }
 

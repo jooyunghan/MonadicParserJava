@@ -89,14 +89,14 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
     }
 
     public static <R> Parser<R> tok(Parser<R> s) {
-        return s.suffix(spaces);
+        return spaces.flatMap(x -> s);
     }
 
-    public static <S, T> Parser<Pair<S, T>> seq(Parser<S> s, Supplier<Parser<? extends T>> t) {
+    public static <S, T> Parser<Pair<S, T>> seq(Parser<S> s, Supplier<Parser<T>> t) {
         return s.flatMap(v1 -> t.get().map(v2 -> pair(v1, v2)));
     }
 
-    public static <T> Parser<T> enclosed(Parser<?> left, Parser<?> right, Supplier<Parser<? extends T>> p) {
+    public static <T> Parser<T> enclosed(Parser<?> left, Parser<?> right, Supplier<Parser<T>> p) {
         return seq(left, p).suffix(right).map(Pair::snd);
     }
 
