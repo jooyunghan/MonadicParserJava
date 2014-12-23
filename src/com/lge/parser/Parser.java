@@ -100,13 +100,21 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
         return seq(left, p).suffix(right).map(Pair::snd);
     }
 
+    @SafeVarargs
+    @SuppressWarnings("unchecked")
+    public static <R> Parser<R> or(Parser<? extends R>... ps) {
+        return input -> {
+            for (Parser<? extends R> p : ps) {
+                Maybe<? extends Pair<? extends R, String>> result = p.apply(input);
+                if (!result.isEmpty()) return (Maybe) result;
+            }
+            return none();
+        };
+    }
+
     // helper
     default public T parse(String input) {
         return apply(input).get()._1;
-    }
-
-    default <R> Parser<R> or(Parser<? extends R> alt) {
-        return input -> apply(input).orElse(() -> (Maybe<Pair<R, String>>) (Maybe<?>) alt.apply(input));
     }
 
     default <R> Parser<R> flatMap(Function<T, Parser<R>> f) {
@@ -126,7 +134,7 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
     }
 
     default Parser<List<T>> many() {
-        return many1().or(succeed(nil()));
+        return or(many1(), succeed(nil()));
     }
 
     default Parser<T> prefix(Parser<?> left) {
@@ -142,6 +150,6 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
     }
 
     default Parser<List<T>> sepBy(Parser<?> sep) {
-        return sepBy1(sep).or(succeed(nil()));
+        return or(sepBy1(sep), succeed(nil()));
     }
 }

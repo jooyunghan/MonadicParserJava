@@ -20,11 +20,7 @@ public class JsonParser {
     private static final Parser<?> colon = Parser.tok(":");
 
     static public Parser<Json> json() {
-        return jsonObject()
-                .or(jsonArray())
-                .or(jsonNumber())
-                .or(jsonString())
-                .or(jsonLiteral());
+        return Parser.or(jsonObject(), jsonArray(), jsonNumber(), jsonString(), jsonLiteral());
     }
 
     static public Parser<JsonObject> jsonObject() {
@@ -45,9 +41,9 @@ public class JsonParser {
     }
 
     static public Parser<? extends Json> jsonLiteral() {
-        return Parser.tok("true").as(() -> Json.TRUE)
-                .or(Parser.tok("false").as(() -> Json.FALSE))
-                .or(Parser.tok("null").as(() -> Json.NULL));
+        return Parser.or(Parser.tok("true").as(() -> Json.TRUE),
+                Parser.tok("false").as(() -> Json.FALSE),
+                Parser.tok("null").as(() -> Json.NULL));
     }
 
 }

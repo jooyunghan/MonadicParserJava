@@ -14,6 +14,7 @@ public interface Maybe<T> {
         return new Some<T>(t);
     }
 
+    @SuppressWarnings("unchecked")
     static <T> Maybe<T> none() {
         return (Maybe<T>) NONE;
     }
@@ -32,14 +33,16 @@ public interface Maybe<T> {
 
     T get();
 
-    default T getOrElse(Supplier<T> s) {
-        if (isEmpty()) return s.get();
-        else return get();
+    public static <R> R getOrElse(Maybe<? extends R> m, Supplier<? extends R> s) {
+        if (m.isEmpty()) return s.get();
+        else return m.get();
     }
 
-    default <R> Maybe<R> orElse(Supplier<Maybe<? extends R>> s) {
-        if (isEmpty()) return (Maybe<R>) s.get();
-        else return (Maybe<R>) this;
+    // we can safely cast Maybe<? extends R> to Maybe<R>
+    @SuppressWarnings("unchecked")
+    public static <R> Maybe<R> orElse(Maybe<? extends R> m, Supplier<Maybe<? extends R>> s) {
+        if (m.isEmpty()) return (Maybe) s.get();
+        else return (Maybe) m;
     }
 
     public static class Some<T> implements Maybe<T> {
