@@ -33,11 +33,11 @@ public class JsonParserTest {
     @Test
     public void testJsonObject() {
         Map<String, Json> props = new TreeMap<>();
-        props.put("p1", new Json.JsonString("string"));
+        props.put("p1", new Json.JsonString("\uac00str\ning\""));
         props.put("p2", new Json.JsonArray(list(Json.TRUE, Json.FALSE, Json.NULL, new Json.JsonObject(toMap(list())))));
         assertEquals(new Json.JsonObject(props), json().parse("\n" +
                 "{\n" +
-                "\t\"p1\" : \"string\",\n" +
+                "\t\"p1\" : \"\\uac00str\\ning\\\"\",\n" +
                 "\t\"p2\" : [true, false, null, {}]\n" +
                 "}end"));
     }

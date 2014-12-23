@@ -36,8 +36,22 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
     public static Parser<Character> letter = sat(Character::isLetter);
     public static Parser<Character> space = sat(Character::isWhitespace);
     public static Parser<String> word = letter.many().map(Strings::fromChars);
-    public static Parser<String> quotedString = enclosed(ch('"'), ch('"'), () -> sat(c -> c != '"').many()).map(Strings::fromChars);
-    public static Parser<Double> doubleNumber = regex("[+-]?\\d+.\\d+([eE][+-]?\\d+)?").map(Double::valueOf);
+    public static Parser<Character> quotedChar = or(
+            sat(c -> c != '"' && c != '\\' && !Character.isISOControl(c)),
+            ch('\\').flatMap(c -> or(
+                    ch('"'),
+                    ch('\\'),
+                    ch('/'),
+                    ch('b').as(() -> '\b'),
+                    ch('f').as(() -> '\f'),
+                    ch('n').as(() -> '\n'),
+                    ch('r').as(() -> '\r'),
+                    ch('t').as(() -> '\t'),
+                    regex("u\\p{XDigit}{4}").map(s -> (char) Integer.parseInt(s.substring(1), 16))
+            ))
+    );
+    public static Parser<String> quotedString = enclosed(ch('"'), ch('"'), () -> quotedChar.many()).map(Strings::fromChars);
+    public static Parser<Double> doubleNumber = regex("-?\\d+(.\\d+)?([eE][+-]?\\d+)?").map(Double::valueOf);
     public static Parser<String> spaces = space.many().map(Strings::fromChars);
 
     public static <T> Parser<T> succeed(T t) {
