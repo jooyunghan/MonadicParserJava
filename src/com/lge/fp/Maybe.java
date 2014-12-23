@@ -37,9 +37,9 @@ public interface Maybe<T> {
         else return get();
     }
 
-    default Maybe<T> orElse(Supplier<Maybe<?>> s) {
-        if (isEmpty()) return (Maybe<T>) s.get();
-        else return this;
+    default <R> Maybe<R> orElse(Supplier<Maybe<? extends R>> s) {
+        if (isEmpty()) return (Maybe<R>) s.get();
+        else return (Maybe<R>) this;
     }
 
     public static class Some<T> implements Maybe<T> {

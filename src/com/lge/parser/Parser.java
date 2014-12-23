@@ -19,7 +19,7 @@ import static com.lge.fp.Pair.pair;
 
 /**
  * Monadic Parser.
- *
+ * <p>
  * Created by jooyung.han on 12/19/14.
  */
 
@@ -105,8 +105,8 @@ public interface Parser<T> extends Function<String, Maybe<Pair<T, String>>> {
         return apply(input).get()._1;
     }
 
-    default Parser<T> or(Parser<?> alt) {
-        return input -> apply(input).orElse(() -> alt.apply(input));
+    default <R> Parser<R> or(Parser<? extends R> alt) {
+        return input -> apply(input).orElse(() -> (Maybe<Pair<R, String>>) (Maybe<?>) alt.apply(input));
     }
 
     default <R> Parser<R> flatMap(Function<T, Parser<R>> f) {

@@ -19,7 +19,7 @@ public class JsonParser {
     private static final Parser<?> comma = Parser.tok(",");
     private static final Parser<?> colon = Parser.tok(":");
 
-    static public Parser<? extends Json> json() {
+    static public Parser<Json> json() {
         return jsonObject()
                 .or(jsonArray())
                 .or(jsonNumber())
