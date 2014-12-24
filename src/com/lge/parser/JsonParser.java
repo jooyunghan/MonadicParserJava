@@ -9,7 +9,13 @@ import java.util.function.Supplier;
 import static com.lge.data.Json.*;
 
 /**
- * Created by jooyung.han on 12/22/14.
+ * Parsing expression grammar for JSON
+ * 
+ * value := object / array / number / string / literal
+ * object := '{' (keyvalue (',' keyvalue)*)? '}'
+ * keyvalue := string ':' value 
+ * array := '[' (value (',' value))?  ']' 
+ * literal := 'true' / 'false' / 'null'
  */
 
 public class JsonParser {
@@ -18,15 +24,19 @@ public class JsonParser {
     private static final Parser<String> string_ = Parser.tok(Parser.quotedString);
     private static final Parser<Double> double_ = Parser.tok(Parser.doubleNumber);
 
+    // value := object / array / number / string / literal
     static public Parser<Json> json() {
         return Parser.or(jsonObject(), jsonArray(), jsonNumber(), jsonString(), jsonLiteral());
     }
 
+    // object := '{' (keyvalue (',' keyvalue)*)? '}'
+    // keyvalue := string ':' value
     static public Parser<JsonObject> jsonObject() {
         Parser<Pair<String, Json>> keyValue = Parser.seq(string_.suffix(colon), () -> json());
         return brace(() -> keyValue.sepBy(comma)).map(List::toMap).map(JsonObject::new);
     }
 
+    // array := '[' (value (',' value))?  ']'
     static public Parser<JsonArray> jsonArray() {
         return bracket(() -> json().sepBy(comma)).map(JsonArray::new);
     }
@@ -39,6 +49,7 @@ public class JsonParser {
         return string_.map(JsonString::new);
     }
 
+    // literal := 'true' / 'false' / 'null'
     static public Parser<? extends Json> jsonLiteral() {
         return Parser.or(Parser.tok("true").as(() -> Json.TRUE),
                 Parser.tok("false").as(() -> Json.FALSE),

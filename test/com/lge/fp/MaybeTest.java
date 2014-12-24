@@ -8,15 +8,14 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 public class MaybeTest {
-    static class A {
+    static class Base { }
 
-    }
-    static class B extends A {
+    static class A extends Base { }
 
-    }
-    static class C extends A {
+    static class B extends A { }
 
-    }
+    static class C extends A { }
+
     @Test
     public void getOrElseAsStatic() {
         A a1 = getOrElse(some(new B()), () -> new C());
