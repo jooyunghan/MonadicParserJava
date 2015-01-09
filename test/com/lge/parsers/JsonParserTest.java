@@ -1,4 +1,4 @@
-package com.lge.parser;
+package com.lge.parsers;
 
 import com.lge.data.Json;
 import org.junit.Test;
@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 import static com.lge.fp.List.list;
 import static com.lge.fp.List.toMap;
-import static com.lge.parser.JsonParser.*;
+import static com.lge.parsers.JsonParser.*;
 import static org.junit.Assert.assertEquals;
 
 /**

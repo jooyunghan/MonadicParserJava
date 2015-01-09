@@ -1,8 +1,9 @@
-package com.lge.parser;
+package com.lge.parsers;
 
 import com.lge.data.Json;
 import com.lge.fp.List;
 import com.lge.fp.Pair;
+import com.lge.parser.Parser;
 
 import java.util.function.Supplier;
 
