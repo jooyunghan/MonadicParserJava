@@ -6,13 +6,16 @@ import java.util.TreeMap;
 import java.util.function.Consumer;
 
 /**
- * Created by jooyung.han on 12/19/14.
+ * Basic implementation of List
+ * 
+ * Limitations:
+ *  - some methods uses recursive calls to tails (may cause stackoverflow for long lists)
  */
 public abstract class List<T> {
     private static final List<Object> NIL = new Nil();
 
     public static <T> List<T> cons(T h, List<T> t) {
-        return new Cons<T>(h, t);
+        return new Cons<>(h, t);
     }
 
     @SuppressWarnings("unchecked")
